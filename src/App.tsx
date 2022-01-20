@@ -33,6 +33,16 @@ export function App () {
         <p>And this is a Scale TextField with custom event binding:</p>
         <p><ScaleTextField value={text} onScaleChange={handleScaleInputChange} /></p>
       </section>
+
+      <section>
+        <p>This is a regular input field where just the value is bound:</p>
+        <p><input type="text" value={text} /></p>
+      </section>
+
+      <section>
+        <p>... and the Scale TextField:</p>
+        <p><ScaleTextField value={text} /></p>
+      </section>
     </ScaleAppShell>
   </>
 }
