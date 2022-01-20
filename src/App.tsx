@@ -1,26 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { ChangeEvent, useEffect, useState } from 'react'
+import { ScaleAppShell, ScaleTextField } from '@telekom/scale-components-react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export function App () {
+  const [text, setText] = useState('')
+
+  useEffect(() => {
+    // reject "a" characters
+    console.info('effect running', text)
+    setText(text.replace(/a/gi, ''))
+  }, [text])
+
+  function handleInputChange (event: ChangeEvent<HTMLInputElement>) {
+    console.info('handleInputChange', event)
+    setText(event.target.value)
+  }
+
+  function handleScaleInputChange (event: CustomEvent) {
+    console.info('handleScaleInputChange', event)
+    setText(event.detail.value)
+  }
+
+  return <>
+    <ScaleAppShell>
+      <h1 className="scl-font-variant-heading-1">'ello 👋</h1>
+
+      <section>
+        <p>This is a regular input field with regular react bindings:</p>
+        <p><input type="text" value={text} onChange={handleInputChange} /></p>
+      </section>
+
+      <section>
+        <p>And this is a Scale TextField with custom event binding:</p>
+        <p><ScaleTextField value={text} onScaleChange={handleScaleInputChange} /></p>
+      </section>
+    </ScaleAppShell>
+  </>
 }
-
-export default App;

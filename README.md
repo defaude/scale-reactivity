@@ -1,46 +1,56 @@
-# Getting Started with Create React App
+# Scale + React = ❤️ ?
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+In this repo, I'm documenting a few issues I'm running into when trying to use the Scale components with React.
 
-## Available Scripts
+## Inconsistent "getting started" documentation
 
-In the project directory, you can run:
+The code snippet for the custom element loader on https://github.com/telekom/scale#setup-with-a-bundler-or-es-modules
+looks like this:
 
-### `npm start`
+```ts
+applyPolyfills().then(() => {
+  defineCustomElements(window)
+})
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+However, the documentation
+on https://www.brand-design.telekom.com/scale/?path=/story/scale-for-developers-scale-and-react--page&globals=locale:en
+simply states:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```ts
+import { defineCustomElements } from '@telekom/scale-components/loader';
+import '@telekom/scale-components/dist/scale-components/scale-components.css';
 
-### `npm test`
+// ...
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+defineCustomElements();
+```
 
-### `npm run build`
+Both seem to work, but which one is the "correct" and most recent one?
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Dev server logs full of warnings regarding source maps
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Even though the app itself seems to work, the dev server's log is full of messages like this:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+WARNING in ./node_modules/@telekom/scale-components-react/dist/react-component-lib/utils/case.js
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/code/scale-issues/node_modules/@telekom/scale-components-react/src/react-component-lib/utils/case.ts' file: Error: ENOENT: no such file or directory, open '/code/scale-issues/node_modules/@telekom/scale-components-react/src/react-component-lib/utils/case.ts'
+ @ ./node_modules/@telekom/scale-components-react/dist/react-component-lib/utils/index.js 62:13-30
+ @ ./node_modules/@telekom/scale-components-react/dist/react-component-lib/createComponent.js 27:16-34
+ @ ./node_modules/@telekom/scale-components-react/dist/react-component-lib/index.js 7:24-52
+ @ ./node_modules/@telekom/scale-components-react/dist/components.js 13:30-62
+ @ ./node_modules/@telekom/scale-components-react/dist/index.js 24:13-36
+ @ ./src/App.tsx 5:0-64 10:35-48
+ @ ./src/index.tsx 7:0-28 15:33-36
+```
 
-### `npm run eject`
+## Funky reactivity / component value binding
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Both inputs in [App.ts](src/App.tsx) are supposed to "reject" all "a" characters (i.e. simply remove it immediately when
+one is detected. This is achieved using an effect that fires whenever the `text` value is updated. The normal HTML input
+works just fine: Trying to type an "a" in there just won't do.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+However: When using the Scale TextField, the effect is triggering correctly (state value gets updated properly) but the
+Scale TextField still shows the "a" character(s) at the end. It seems that the value change from the outside is not
+properly reflected into the component's internal state?
