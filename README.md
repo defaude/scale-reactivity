@@ -47,10 +47,16 @@ Failed to parse source map from '/code/scale-issues/node_modules/@telekom/scale-
 
 ## Funky reactivity / component value binding
 
-Both inputs in [App.ts](src/App.tsx) are supposed to "reject" all "a" characters (i.e. simply remove it immediately when
-one is detected. This is achieved using an effect that fires whenever the `text` value is updated. The normal HTML input
-works just fine: Trying to type an "a" in there just won't do.
+The first pair of inputs in [App.tsx](src/App.tsx) are supposed to "reject" all "a" characters (i.e. simply remove it 
+immediately when one is detected. This is achieved using an effect that fires whenever the `text` value is updated. The
+normal HTML input works just fine: Trying to type an "a" in there just won't do.
 
 However: When using the Scale TextField, the effect is triggering correctly (state value gets updated properly) but the
 Scale TextField still shows the "a" character(s) at the end. It seems that the value change from the outside is not
 properly reflected into the component's internal state?
+
+Going one step further: The second pair of inputs is bound so that only their value is bound but no change handler is
+registered. (Yeah, we could discuss the sense or meaning of this, of course, but let's just stick with the tech for a
+second 😅). The regular input element will be effectively "read only" since the underlying React value doesn't change.
+The Scale TextView component, however, allows editing - at least "optical" since the state changes are not sent to the
+React app, of course.
